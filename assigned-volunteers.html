@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organizer - Assigned Volunteers</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f8f9fa; margin:0; padding:20px; }
+  h1 { text-align:center; color:#1b4332; }
+  table { width:100%; border-collapse: collapse; margin-top:20px; }
+  th, td { border:1px solid #ccc; padding:10px; text-align:left; }
+  th { background:#2d6a4f; color:white; }
+  .refresh-btn {
+    display:block;
+    margin:20px auto;
+    padding:10px 18px;
+    background:#2d6a4f;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .refresh-btn:hover { background:#1b4332; }
+</style>
+</head>
+<body>
+<h1>Assigned Volunteers</h1>
+
+<button class="refresh-btn" onclick="loadVolunteers()">🔄 Refresh</button>
+
+<table id="volunteersTable">
+  <thead>
+    <tr>
+      <th>Volunteer ID</th>
+      <th>Volunteer Name</th>
+      <th>Email</th>
+      <th>Event ID</th>
+      <th>Event Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Volunteers from DB will load here -->
+  </tbody>
+</table>
+
+<script>
+async function loadVolunteers() {
+  try {
+    const res = await fetch("http://localhost:5000/api/assigned-volunteers");
+    const volunteers = await res.json();
+    const tbody = document.querySelector("#volunteersTable tbody");
+    tbody.innerHTML = "";
+
+    if (volunteers.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No volunteers assigned yet</td></tr>`;
+      return;
+    }
+
+    volunteers.forEach(v => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${v.id}</td>
+        <td>${v.volunteer_name}</td>
+        <td>${v.volunteer_email}</td>
+        <td>${v.event_id}</td>
+        <td>${v.event_name}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error("Error fetching volunteers:", err);
+  }
+}
+
+// Load volunteers on page load
+loadVolunteers();
+
+// Optional: Auto-refresh every 10 seconds
+setInterval(loadVolunteers, 10000);
+</script>
+</body>
+</html>

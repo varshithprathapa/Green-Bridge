@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer - Available Events</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8f9fa; margin:0; padding:20px; }
+    h1 { text-align:center; color:#1b4332; }
+    table { width:100%; border-collapse: collapse; margin-top:20px; }
+    th, td { border:1px solid #ccc; padding:10px; text-align:left; }
+    th { background:#2d6a4f; color:white; }
+    button {
+      padding: 6px 12px;
+      background: #2d6a4f;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover { background:#1b4332; }
+  </style>
+</head>
+<body>
+  <h1>Available Events</h1>
+
+  <table id="eventsTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Time</th>
+        <th>Volunteers Needed</th>
+        <th>Description</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Events from DB will load here -->
+    </tbody>
+  </table>
+
+  <script>
+    async function loadEvents() {
+      try {
+        const res = await fetch("http://localhost:5000/api/events");
+        const events = await res.json();
+        const tbody = document.querySelector("#eventsTable tbody");
+        tbody.innerHTML = "";
+
+        events.forEach(event => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${event.id}</td>
+            <td>${event.name}</td>
+            <td>${event.location}</td>
+            <td>${new Date(event.event_time).toLocaleString()}</td>
+            <td>${event.volunteers_needed}</td>
+            <td>${event.description || ''}</td>
+            <td><button onclick="joinEvent(${event.id}, '${event.name}')">Join</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      }
+    }
+
+    // ✅ Redirect to assign page with event details
+    function joinEvent(eventId, eventName) {
+      window.location.href = `assign.html?eventId=${eventId}&eventName=${encodeURIComponent(eventName)}`;
+    }
+
+    // Load events on page load
+    loadEvents();
+  </script>
+</body>
+</html>

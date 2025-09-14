@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organizer - Conduct Event</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f8f6;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #1b4332;
+    }
+    form {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #2d6a4f;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      background: #2d6a4f;
+      color: white;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #1b4332;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Conduct New Event</h1>
+
+  <form id="eventForm">
+    <label for="eventName">Event Name:</label>
+    <input type="text" id="eventName" required>
+
+    <label for="eventPlace">Event Place:</label>
+    <input type="text" id="eventPlace" required>
+
+    <label for="eventTime">Event Time:</label>
+    <input type="datetime-local" id="eventTime" required>
+
+    <label for="volunteers">Number of Volunteers Needed:</label>
+    <input type="number" id="volunteers" min="1" required>
+
+    <label for="description">Description:</label>
+    <textarea id="description" rows="4"></textarea>
+
+    <button type="submit">Create Event</button>
+  </form>
+
+  <script>
+    document.getElementById("eventForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const eventData = {
+        name: document.getElementById("eventName").value,
+        location: document.getElementById("eventPlace").value,
+        event_time: document.getElementById("eventTime").value,
+        volunteers_needed: document.getElementById("volunteers").value,
+        description: document.getElementById("description").value,
+        created_by: "Organizer1" // Replace with logged-in user later
+      };
+
+      try {
+        const res = await fetch("http://localhost:5000/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(eventData)
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert("✅ Event created successfully!");
+          document.getElementById("eventForm").reset();
+        } else {
+          alert("❌ Error: " + (data.error || "Unknown error"));
+        }
+      } catch (err) {
+        console.error("Error submitting event:", err);
+        alert("Network error: " + err.message);
+      }
+    });
+  </script>
+
+</body>
+</html>

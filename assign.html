@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer Form</title>
+  <style>
+    body { font-family: Arial; background:#f1f8f6; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+    .form-container { background:white; padding:30px; border-radius:12px; width:100%; max-width:400px; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+    h1, h2 { text-align:center; color:#1b4332; margin-bottom:20px; }
+    input, textarea, select, button { width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc; font-size:0.95rem; }
+    textarea { resize:vertical; min-height:70px; }
+    button { background:#2d6a4f; color:white; border:none; cursor:pointer; }
+    button:hover { background:#1b4332; }
+    .back-link { display:block; text-align:center; margin-top:10px; color:#2d6a4f; text-decoration:none; }
+    .back-link:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h1>Volunteer Form</h1>
+    <h2 id="eventTitle"></h2>
+    <form id="volunteerForm">
+      <input type="text" id="name" placeholder="Full Name" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="tel" id="phone" placeholder="Phone Number" required>
+      <textarea id="skills" placeholder="Skills (optional)"></textarea>
+      <select id="availability" required>
+        <option value="">Availability</option>
+        <option value="Weekdays">Weekdays</option>
+        <option value="Weekends">Weekends</option>
+        <option value="Anytime">Anytime</option>
+      </select>
+      <button type="submit">Submit</button>
+    </form>
+    <a href="volunteer-dashboard.html" class="back-link">⬅ Back to Dashboard</a>
+  </div>
+
+  <script>
+    // Get event name from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventName = urlParams.get("event") || "Unknown Event";
+
+    // Display event name
+    document.getElementById("eventTitle").innerText = "Event: " + eventName;
+
+    // Submit form
+    document.getElementById("volunteerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        skills: document.getElementById("skills").value,
+        availability: document.getElementById("availability").value,
+        event_name: eventName
+      };
+
+      try {
+        const response = await fetch("http://localhost:5000/api/volunteer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // Show success message
+          alert(result.message);
+          // Redirect to dashboard after 1 second
+          setTimeout(() => {
+            window.location.href = "volunteer-dashboard.html";
+          }, 1000);
+        } else {
+          alert(result.error || "Something went wrong!");
+        }
+
+      } catch (err) {
+        console.error("Error:", err);
+        alert("Something went wrong!");
+      }
+    });
+  </script>
+</body>
+</html>
